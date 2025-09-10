@@ -13,8 +13,6 @@ import FileGatherer
 import Headers
 import Proxies
 import FileFilterer
-import FileWriter
-import DuplicateFilter
 
 
 class ArxivScraper:
@@ -70,10 +68,6 @@ class ArxivScraper:
             except requests.exceptions.RequestException as e:
                 print(f"\rProcessing files at index {print_index}... Request failed on attempt: {e}")
         return None
-
-    def handle_file_result(self, response: requests.Response, filter_result: tuple, result_index: int,
-                           path_to_directory: str):
-        pass
 
     # Iteratively gather a set number of results for the desired query
         # @param query : The arXiv search query
@@ -136,53 +130,6 @@ class ArxivScraper:
             result_index = FileGatherer.FileGatherer().handle_file_result(response, filter_result,
                                                                           result_index, path_to_directory, None, None)
         print("\nAll results scraped.")
-
-def query_arxiv():
-    # Base api query url
-    base_url = 'http://export.arxiv.org/api/query?'
-
-    # Search parameters
-    search_query = 'all:biophysics'  # search for electron in all fields
-    start = 0  # start at the first result
-    total_results = 20  # want 20 total results
-    results_per_iteration = 5  # 5 results at a time
-    wait_time = 3  # number of seconds to wait between calls
-
-    print(f"Searching arXiv for {search_query}")
-
-    for i in range(start, total_results, results_per_iteration):
-        print(f"Results {i} - {i + results_per_iteration}")
-
-        query = f"search_query={search_query}&start={i}&max_results={results_per_iteration}"
-
-        # perform a GET request using the base_url and query
-        session = requests.Session()
-        response = session.get(base_url + query)
-
-        if response.status_code != 200:
-            # This request failed, add retries later
-            continue
-
-        soup = BeautifulSoup(response.text, features="xml")
-        for element in soup.select("entry"):
-            title = element.select_one('title').text
-            authors = ', '.join([author.text for author in element.select('author > name')])
-            link = element.select_one('id').text.replace('abs', 'pdf')
-            mod_date = element.select_one('updated').text[:10]
-            abstract = element.select_one('summary').text
-
-            print(f"Title: {title}")
-            print(f"Authors: {authors}")
-            print(f"Mod Date: {mod_date}")
-            print(f"Link: {link}")
-            print(f"Abstract: {abstract}")
-
-        exit(0)
-
-        # Remember to play nice and sleep a bit before you call
-        # the api again!
-        print(f"Sleeping for {wait_time} seconds")
-        time.sleep(wait_time)
 
 
 if __name__ == '__main__':
