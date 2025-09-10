@@ -6,6 +6,7 @@ from fuzzywuzzy import fuzz
 
 
 class FileFilterer:
+    THRESHOLD = 60
 
     # Determines the Jaccard Similarity for a query and a paper's title
     # Useful for substring matching
@@ -38,7 +39,7 @@ class FileFilterer:
         fuzzy = self.fuzzy_partial(query, title, keywords)
         return (jaccard * 100 + fuzzy) / 2  # Normalize Jaccard and blend scores
 
-    # Determines if a file is good and relevant to the query or not
+    # Determines if a file is good and relevant to the query or not -- for Google Scholar results
         # @param file : The file to check
         # @param query : The Google Scholar search query
         # @param meta_can_be_missing : Boolean toggle that determines if absent title and author is acceptable
@@ -76,10 +77,52 @@ class FileFilterer:
                         keywords = [keywords]  # Convert to list, if not already
                 score = self.hybrid_match(query, title, keywords)
                 keywords = str(keywords)  # Convert list to string for printing ease later
-                threshold = 60
-                if score >= threshold:
+                if score >= self.THRESHOLD:
                     modDate = meta['/ModDate'][6:8] + '-' + meta['/ModDate'][2:6]
                     is_good_file = (True, title, keywords, meta['/Author'], modDate)
                 else:  # TEST CODE
                     is_good_file = (False, title, keywords, None, None)
+            return is_good_file
+
+    # Determines if a file is good and relevant to the query or not -- for arXiv results
+        # @param file : The file to check
+        # @param element : Dictionary containing metadata for file
+        # @param query : The Google Scholar search query
+        # @param meta_can_be_missing : Boolean toggle that determines if absent title and author is acceptable
+    def arxiv_filter(self, file: io.BytesIO, element: dict, query: str, meta_can_be_missing: bool):
+        is_good_file = (False, None, None, None, None)
+        try:
+            pdf_reader = PyPDF2.PdfReader(file)
+            meta = pdf_reader.metadata
+        except Exception as e:
+            # print("File could not be opened.")
+            # Bad file
+            return is_good_file
+        else:
+            if meta is None:
+                # Unknown file
+                # print("File read as NoneType")
+                return is_good_file
+            title = element['title']
+            authors = element['authors']
+            mod_date = element['mod_date']
+            abstract = element['abstract']
+            # Check if title and author are allowed to be missing
+            if not meta_can_be_missing:
+                # Check that all tags are not the default values
+                if title == "No title" or authors == "No authors" or mod_date is None or abstract is None:
+                    # File missing metadata
+                    return is_good_file
+            if '/Keywords' not in meta.keys():
+                keywords = [""]
+            else:
+                keywords = meta['/Keywords']
+                if not isinstance(keywords, list):
+                    keywords = [keywords]  # Convert to list, if not already
+            score = self.hybrid_match(query, title, keywords)
+            keywords = str(keywords)  # Convert list to string for printing ease later
+            if score >= self.THRESHOLD:
+                is_good_file = (True, title, keywords, authors, mod_date)
+            else:
+                is_good_file = (False, title, keywords, None, None)
             return is_good_file
