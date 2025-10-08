@@ -125,7 +125,7 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+def main():
     args = parse_args()  # Get the args
 
     # Run only the portion(s) of the tool that is appropriate
@@ -147,3 +147,7 @@ if __name__ == '__main__':
 
     elif args.command == 'convert':
         run_text_converter(args.directory)
+
+
+if __name__ == '__main__':
+    main()
