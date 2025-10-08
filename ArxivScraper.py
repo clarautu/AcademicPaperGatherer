@@ -133,13 +133,3 @@ class ArxivScraper:
                                                                           result['abstract'])
         print("\nAll ArXiv results scraped.")
 
-
-if __name__ == '__main__':
-    query = "Large Language Models"
-    directory = "arxiv_llm"
-    total_results = 20
-    results = ArxivScraper().scrape_results(query, total_results)
-    os.makedirs(directory, exist_ok=True)
-    with open(os.path.join(directory, "results.txt"), 'w') as f:
-        json.dump(results, f)
-    ArxivScraper().gather_files(results, query, directory, False)
