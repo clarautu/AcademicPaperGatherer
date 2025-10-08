@@ -106,11 +106,10 @@ class FileFilterer:
             title = element['title']
             authors = element['authors']
             mod_date = element['mod_date']
-            abstract = element['abstract']
             # Check if title and author are allowed to be missing
             if not meta_can_be_missing:
                 # Check that all tags are not the default values
-                if title == "No title" or authors == "No authors" or mod_date is None or abstract is None:
+                if title == "No title" or authors == "No authors" or mod_date is None:
                     # File missing metadata
                     return is_good_file
             if '/Keywords' not in meta.keys():

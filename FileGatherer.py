@@ -127,8 +127,10 @@ class FileGatherer:
         # @path_to_directory : The path to the directory where files are to be saved
         # @param year_start : The starting year of a date range - use None if no filtering is desired
         # @param year_end : The ending year of a date range - use None if no filtering is desired
+        # @param abstract : The abstract for the file -- used for ArXiv file handling
     def handle_file_result(self, response: requests.Response, filter_result: tuple, result_index: int,
-                           path_to_directory: str, year_start: int or None, year_end: int or None):
+                           path_to_directory: str, year_start: int or None, year_end: int or None,
+                           abstract: str or None = None):
         if filter_result[0]:
             year_is_good = True
             if year_start is not None and year_end is not None:
@@ -146,6 +148,9 @@ class FileGatherer:
                                   filter_result[3], 'w', "utf-8")
                 writer.write_file(os.path.join(path_to_directory, "ModDate", f"{result_index}.txt"),
                                   filter_result[4], 'w', "utf-8")
+                if abstract is not None:
+                    writer.write_file(os.path.join(path_to_directory, "Abstracts", f"{result_index}.txt"),
+                                      abstract, 'w', "utf-8")
                 # print(f"File '{file_path}' downloaded.")
                 result_index += 1
                 if self.no_good_article_found is True:  # Only update this value once

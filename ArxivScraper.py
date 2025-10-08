@@ -77,13 +77,14 @@ class ArxivScraper:
         arXiv_results = []
         start = 0
         while start < total_results:
-            print(f"\rGetting results {start}-{start + num - 1}", end="", flush=True)
+            print(f"\rGetting ArXiv results {start}-{start + num - 1}", end="", flush=True)
             url = self.__build_url(query, start, num)
             session = requests.Session()
             headers_to_use = Headers.Headers().get_rand_header()
             session.headers = headers_to_use
             response = session.get(url)
 
+            # Attempt to resolve bad responses
             if response.status_code != 200:
                 try:
                     selected_proxy = Proxies.Proxies().get_python_proxy()  # Use pypi proxies
@@ -106,7 +107,7 @@ class ArxivScraper:
             # Add delays to scraping to ensure API compliance
             delay = random.uniform(3, 7)
             time.sleep(delay)
-        print(f"\rScraping complete for all {total_results} results", flush=True)
+        print(f"\rScraping ArXiv complete for all {total_results} results", flush=True)
         return arXiv_results
 
     def gather_files(self, results: list, query: str, path_to_directory: str, meta_can_be_missing: bool):
@@ -114,7 +115,7 @@ class ArxivScraper:
         print_index = 0
         for result in results:  # Iterate over results
             print_index += 1
-            print(f"\rProcessing files at index {print_index}...", end="", flush=True)
+            print(f"\rProcessing ArXiv files at index {print_index}...", end="", flush=True)
 
             url = result['link']
             if url is None:
@@ -128,8 +129,9 @@ class ArxivScraper:
             pdf_file_obj = io.BytesIO(response.content)
             filter_result = FileFilterer.FileFilterer().arxiv_filter(pdf_file_obj, result, query, meta_can_be_missing)
             result_index = FileGatherer.FileGatherer().handle_file_result(response, filter_result,
-                                                                          result_index, path_to_directory, None, None)
-        print("\nAll results scraped.")
+                                                                          result_index, path_to_directory, None, None,
+                                                                          result['abstract'])
+        print("\nAll ArXiv results scraped.")
 
 
 if __name__ == '__main__':

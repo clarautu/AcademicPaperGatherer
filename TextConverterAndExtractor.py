@@ -25,13 +25,15 @@ class TextConverterAndExtractor:
             # Write the text as a file
             writer.write_file(os.path.join(path_to_directory, "Articles-Text", f"{index}.txt"), content, 'w', "utf-8")
 
-            # Extract text between "Abstract" and "Introduction" to catch most abstracts
-            abstract_start = content.lower().find("abstract")
-            if abstract_start != -1:
-                abstract_end = content.lower().find("introduction", abstract_start)
-                abstract = content[abstract_start:abstract_end].strip() if abstract_end != -1 \
-                    else content[abstract_start:].strip()
-                writer.write_file(os.path.join(path_to_directory, "Abstracts", f"{index}.txt"), abstract, 'w', "utf-8")
+            # Only extract abstract if it does not already exist -- ArXiv supplies full abstracts in responses
+            if not os.path.exists(os.path.join(path_to_directory, "Abstracts", f"{index}.txt")):
+                # Extract text between "Abstract" and "Introduction" to catch most abstracts
+                abstract_start = content.lower().find("abstract")
+                if abstract_start != -1:
+                    abstract_end = content.lower().find("introduction", abstract_start)
+                    abstract = content[abstract_start:abstract_end].strip() if abstract_end != -1 \
+                        else content[abstract_start:].strip()
+                    writer.write_file(os.path.join(path_to_directory, "Abstracts", f"{index}.txt"), abstract, 'w', "utf-8")
 
             # Extract images
             image_list = []
