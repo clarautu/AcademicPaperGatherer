@@ -216,6 +216,7 @@ APG results --query "machine learning" --directory "ml_data" --total_results 50
 ---
 
 Only gather results from ArXiv:
+
 Locally
 ```bash
 python cli.py arxiv --query "machine learning" --directory "ml_data" --total_results 50
@@ -227,6 +228,7 @@ APG arxiv --query "machine learning" --directory "ml_data" --total_results 50
 ---
 
 Convert already-downloaded files:
+
 Locally
 ```bash
 python cli.py convert --directory "ml_data"
