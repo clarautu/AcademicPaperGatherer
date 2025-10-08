@@ -5,6 +5,7 @@ import json
 import FileGatherer
 import ResultGatherer
 import TextConverterAndExtractor
+import ArxivScraper
 
 
 # Method that validates a CLI parameter is a positive integer
@@ -23,6 +24,21 @@ def valid_year(value):
     if ivalue < 1900 or ivalue > 2100:
         raise argparse.ArgumentTypeError("Year must be between 1900 and 2100.")
     return ivalue
+
+
+# Method that runs the ArXiv portion of the tool
+    # @param query : The ArXiv search query
+    # @param directory : The directory to save files to
+    # @param total_results : The total number of results to gather
+    # @param meta_can_be_missing : Boolean toggle that determines if absent title and author is acceptable
+def run_arxiv(query, directory, total_results, meta_can_be_missing):
+    directory_updated = os.path.join(directory, "ArXiv")
+    scraper = ArxivScraper.ArxivScraper()
+    results = scraper.scrape_results(query, total_results)
+    os.makedirs(directory_updated, exist_ok=True)
+    with open(os.path.join(directory_updated, "results.txt"), 'w') as f:
+        json.dump(results, f)
+    scraper.gather_files(results, query, directory_updated, meta_can_be_missing)
 
 
 # Method that runs the result gathering portion of the tool
@@ -68,32 +84,43 @@ def parse_args():
 
     # Add a subparser for running all portions of the tool
     all_parser = subparsers.add_parser('all', help='Run the full pipeline')
-    all_parser.add_argument('--query', required=True)
-    all_parser.add_argument('--directory', required=True)
-    all_parser.add_argument('--total_results', type=valid_positive_int, default=100)
-    all_parser.add_argument('--year_start', type=valid_year, default=None)
-    all_parser.add_argument('--year_end', type=valid_year, default=None)
-    all_parser.add_argument('--meta_can_be_missing', action='store_true')
+    all_parser.add_argument('--query', required=True, help='The search query to use')
+    all_parser.add_argument('--directory', required=True, help='The directory to save files to')
+    all_parser.add_argument('--total_results', type=valid_positive_int, default=100, help='How many results to scrape')
+    all_parser.add_argument('--year_start', type=valid_year, default=None, help='The start year of articles to gather')
+    all_parser.add_argument('--year_end', type=valid_year, default=None, help='The end year of articles to gather')
+    all_parser.add_argument('--meta_can_be_missing', action='store_true',
+                            help='Flag allowing for articles with missing metadata to be gathered')
+    all_parser.add_argument('--include_arxiv', action='store_true', help='Flag to also scrape results from ArXiv')
+
+    # Add a subparser for running the ArXiv portion of the tool
+    arxiv_parser = subparsers.add_parser('arxiv', help='Run ArXiv scraping and gathering')
+    arxiv_parser.add_argument('--query', required=True, help='The search query to use')
+    arxiv_parser.add_argument('--directory', required=True, help='The directory to save files to')
+    arxiv_parser.add_argument('--total_results', type=valid_positive_int, default=100, help='How many results to scrape')
+    arxiv_parser.add_argument('--meta_can_be_missing', action='store_true',
+                              help='Flag allowing for articles with missing metadata to be gathered')
 
     # Add a subparser for running just the result gathering portion of the tool
     res_parser = subparsers.add_parser('results', help='Run only result gathering')
-    res_parser.add_argument('--query', required=True)
-    res_parser.add_argument('--directory', required=True)
-    res_parser.add_argument('--total_results', type=valid_positive_int, default=100)
-    res_parser.add_argument('--year_start', type=valid_year, default=None)
-    res_parser.add_argument('--year_end', type=valid_year, default=None)
+    res_parser.add_argument('--query', required=True, help='The search query to use')
+    res_parser.add_argument('--directory', required=True, help='The directory to save files to')
+    res_parser.add_argument('--total_results', type=valid_positive_int, default=100, help='How many results to scrape')
+    res_parser.add_argument('--year_start', type=valid_year, default=None, help='The start year of articles to gather')
+    res_parser.add_argument('--year_end', type=valid_year, default=None, help='The end year of articles to gather')
 
     # Add a subparser for running just the file gathering portion of the tool
     files_parser = subparsers.add_parser('files', help='Run only file gathering')
-    files_parser.add_argument('--query', required=True)
-    files_parser.add_argument('--directory', required=True)
-    files_parser.add_argument('--year_start', type=valid_year, default=None)
-    files_parser.add_argument('--year_end', type=valid_year, default=None)
-    files_parser.add_argument('--meta_can_be_missing', action='store_true')
+    files_parser.add_argument('--query', required=True, help='The search query to use')
+    files_parser.add_argument('--directory', required=True, help='The directory to save files to')
+    files_parser.add_argument('--year_start', type=valid_year, default=None, help='The start year of articles to gather')
+    files_parser.add_argument('--year_end', type=valid_year, default=None, help='The end year of articles to gather')
+    files_parser.add_argument('--meta_can_be_missing', action='store_true',
+                              help='Flag allowing for articles with missing metadata to be gathered')
 
     # Add a subparser for running just the text converting and extracting portion of the tool
     conv_parser = subparsers.add_parser('convert', help='Run only text conversion and extraction')
-    conv_parser.add_argument('--directory', required=True)
+    conv_parser.add_argument('--directory', required=True, help='The directory files are saved to')
 
     return parser.parse_args()
 
@@ -105,7 +132,12 @@ if __name__ == '__main__':
     if args.command == 'all':
         run_result_gatherer(args.query, args.directory, args.total_results, args.year_start, args.year_end)
         run_file_gatherer(args.query, args.directory, args.year_start, args.year_end, args.meta_can_be_missing)
+        if args.include_arxiv:
+            run_arxiv(args.query, args.directory, args.total_results, args.meta_can_be_missing)
         run_text_converter(args.directory)
+
+    elif args.command == 'arxiv':
+        run_arxiv(args.query, args.directory, args.total_results, args.meta_can_be_missing)
 
     elif args.command == 'results':
         run_result_gatherer(args.query, args.directory, args.total_results, args.year_start, args.year_end)
