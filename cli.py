@@ -100,6 +100,7 @@ def parse_args():
     arxiv_parser.add_argument('--total_results', type=valid_positive_int, default=100, help='How many results to scrape')
     arxiv_parser.add_argument('--meta_can_be_missing', action='store_true',
                               help='Flag allowing for articles with missing metadata to be gathered')
+    arxiv_parser.add_argument('--convert_to_plain', action='store_true', help='Flag to also convert PDFs to plain text')
 
     # Add a subparser for running just the result gathering portion of the tool
     res_parser = subparsers.add_parser('results', help='Run only result gathering')
@@ -138,6 +139,8 @@ def main():
 
     elif args.command == 'arxiv':
         run_arxiv(args.query, args.directory, args.total_results, args.meta_can_be_missing)
+        if args.convert_to_plain:
+            run_text_converter(args.directory)
 
     elif args.command == 'results':
         run_result_gatherer(args.query, args.directory, args.total_results, args.year_start, args.year_end)
