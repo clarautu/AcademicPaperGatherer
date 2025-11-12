@@ -9,10 +9,10 @@ from urllib3.exceptions import MaxRetryError
 import os
 import json
 
-import FileGatherer
-import Headers
-import Proxies
-import FileFilterer
+import AcademicPaperGatherer.FileGatherer
+import AcademicPaperGatherer.Headers
+import AcademicPaperGatherer.Proxies
+import AcademicPaperGatherer.FileFilterer
 
 
 class ArxivScraper:

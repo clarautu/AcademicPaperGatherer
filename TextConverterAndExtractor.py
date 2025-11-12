@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import pymupdf
 
-import FileWriter
+import AcademicPaperGatherer.FileWriter
 
 
 class TextConverterAndExtractor:

@@ -5,10 +5,10 @@ import random
 import time
 import io
 
-import FileFilterer
-import FileWriter
-import DuplicateFilter
-import Headers
+import AcademicPaperGatherer.FileFilterer
+import AcademicPaperGatherer.FileWriter
+import AcademicPaperGatherer.DuplicateFilter
+import AcademicPaperGatherer.Headers
 
 
 class FileGatherer:
