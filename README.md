@@ -49,7 +49,7 @@ python cli.py <command> [options]
 ```bash
 git clone https://github.com/clarautu/AcademicPaperGatherer.git
 cd AcademicPaperGatherer
-pip install
+pip install .
 ```
 This installs the tool globally and allows for running anywhere with
 ```bash
