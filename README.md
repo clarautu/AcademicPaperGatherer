@@ -41,7 +41,7 @@ pip install -r requirements.txt
 ```
 This method allows for local running of the script in the install directory with
 ```bash
-python cli.py <command> [options]
+python run.py <command> [options]
 ```
 
 ### Option 2: Install via pip
@@ -63,7 +63,7 @@ This tool can run its full pipeline or individual modules using subcommands.
 ### General Syntax
 
 ```bash
-python cli.py <command> [options]
+python run.py <command> [options]
 ```
 
 ### Subcommands
@@ -72,7 +72,7 @@ python cli.py <command> [options]
 
 Locally
 ```bash
-python cli.py all --query "search query" --directory "output directory" [options]
+python run.py all --query "search query" --directory "output directory" [options]
 ```
 or globally
 ```bash
@@ -96,7 +96,7 @@ APG all --query "search query" --directory "output directory" [options]
 
 Locally
 ```bash
-python cli.py arxiv --query "search query" --directory "output directory" [options]
+python run.py arxiv --query "search query" --directory "output directory" [options]
 ```
 or globally
 ```bash
@@ -117,7 +117,7 @@ APG arxiv --query "search query" --directory "output directory" [options]
 
 Locally
 ```bash
-python cli.py results --query "search query" --directory "output directory" [options]
+python run.py results --query "search query" --directory "output directory" [options]
 ```
 or globally
 ```bash
@@ -139,7 +139,7 @@ APG results --query "search query" --directory "output directory" [options]
 
 Locally
 ```bash
-python cli.py files --query "search query" --directory "output directory" [options]
+python run.py files --query "search query" --directory "output directory" [options]
 ```
 or globally
 ```bash
@@ -163,7 +163,7 @@ APG files --query "search query" --directory "output directory" [options]
 
 Locally
 ```bash
-python cli.py convert --directory "output directory"
+python run.py convert --directory "output directory"
 ```
 or globally
 ```bash
@@ -183,7 +183,7 @@ Run the whole pipeline (including ArXiv):
 
 Locally
 ```bash
-python cli.py all --query "climate change" --directory "data" --include_arxiv
+python run.py all --query "climate change" --directory "data" --include_arxiv
 ```
 or globally
 ```bash
@@ -195,7 +195,7 @@ Run the whole pipeline (excluding ArXiv):
 
 Locally
 ```bash
-python cli.py all --query "climate change" --directory "data"
+python run.py all --query "climate change" --directory "data"
 ```
 or globally
 ```bash
@@ -207,7 +207,7 @@ Only gather results from Google Scholar:
 
 Locally
 ```bash
-python cli.py results --query "machine learning" --directory "ml_data" --total_results 50
+python run.py results --query "machine learning" --directory "ml_data" --total_results 50
 ```
 or globally
 ```bash
@@ -219,7 +219,7 @@ Only gather results from ArXiv:
 
 Locally
 ```bash
-python cli.py arxiv --query "machine learning" --directory "ml_data" --total_results 50
+python run.py arxiv --query "machine learning" --directory "ml_data" --total_results 50
 ```
 or globally
 ```bash
@@ -231,7 +231,7 @@ Convert already-downloaded files:
 
 Locally
 ```bash
-python cli.py convert --directory "ml_data"
+python run.py convert --directory "ml_data"
 ```
 or globally
 ```bash
