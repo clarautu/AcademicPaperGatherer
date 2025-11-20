@@ -2,10 +2,10 @@ import argparse
 import os
 import json
 
-import AcademicPaperGatherer.FileGatherer
-import AcademicPaperGatherer.ResultGatherer
-import AcademicPaperGatherer.TextConverterAndExtractor
-import AcademicPaperGatherer.ArxivScraper
+from APG.FileGatherer import FileGatherer
+from APG.ResultGatherer import ResultGatherer
+from APG.TextConverterAndExtractor import TextConverterAndExtractor
+from APG.ArxivScraper import ArxivScraper
 
 
 # Method that validates a CLI parameter is a positive integer
@@ -33,7 +33,7 @@ def valid_year(value):
     # @param meta_can_be_missing : Boolean toggle that determines if absent title and author is acceptable
 def run_arxiv(query, directory, total_results, meta_can_be_missing):
     directory_updated = os.path.join(directory, "ArXiv")
-    scraper = ArxivScraper.ArxivScraper()
+    scraper = ArxivScraper()
     results = scraper.scrape_results(query, total_results)
     os.makedirs(directory_updated, exist_ok=True)
     with open(os.path.join(directory_updated, "results.txt"), 'w') as f:
@@ -48,7 +48,7 @@ def run_arxiv(query, directory, total_results, meta_can_be_missing):
     # @param year_start : The starting year of a date range - use None if no filtering is desired
     # @param year_end : The ending year of a date range - use None if no filtering is desired
 def run_result_gatherer(query, directory, total_results, year_start, year_end):
-    results = ResultGatherer.ResultGatherer().scrape_results(query, total_results, year_start, year_end)
+    results = ResultGatherer().scrape_results(query, total_results, year_start, year_end)
     os.makedirs(directory, exist_ok=True)
     with open(os.path.join(directory, "results.txt"), 'w') as f:
         json.dump(results, f)
@@ -67,13 +67,13 @@ def run_file_gatherer(query, directory, year_start, year_end, meta_can_be_missin
         raise FileNotFoundError(f"Cannot find results file: {results_path}")
     with open(results_path, 'r') as f:
         results = json.load(f)
-    FileGatherer.FileGatherer().gather_files(results, query, directory, meta_can_be_missing, year_start, year_end)
+    FileGatherer().gather_files(results, query, directory, meta_can_be_missing, year_start, year_end)
 
 
 # Method that runs the text converting and extracting portion of the tool
     # @param directory : The directory to save files to
 def run_text_converter(directory):
-    TextConverterAndExtractor.TextConverterAndExtractor().convert_and_extract(directory)
+    TextConverterAndExtractor().convert_and_extract(directory)
 
 
 # Method that parses CLI arguments

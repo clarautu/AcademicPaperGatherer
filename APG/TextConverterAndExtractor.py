@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import pymupdf
 
-import AcademicPaperGatherer.FileWriter
+from APG.FileWriter import FileWriter
 
 
 class TextConverterAndExtractor:
@@ -13,7 +13,7 @@ class TextConverterAndExtractor:
         path_list = Path(os.path.join(path_to_directory, "Articles")).glob("**/*.pdf")
 
         for p in path_list:
-            writer = FileWriter.FileWriter()
+            writer = FileWriter()
             index = p.stem
             doc = pymupdf.open(p)  # Open the file
 

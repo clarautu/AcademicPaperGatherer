@@ -9,10 +9,10 @@ from urllib3.exceptions import MaxRetryError
 import os
 import json
 
-import AcademicPaperGatherer.FileGatherer
-import AcademicPaperGatherer.Headers
-import AcademicPaperGatherer.Proxies
-import AcademicPaperGatherer.FileFilterer
+from APG.FileGatherer import FileGatherer
+from APG.Headers import Headers
+from APG.Proxies import Proxies
+from APG.FileFilterer import FileFilterer
 
 
 class ArxivScraper:
@@ -59,7 +59,7 @@ class ArxivScraper:
             try:
                 delay = random.uniform(2, 5)
                 time.sleep(delay)
-                headers_to_use = Headers.Headers().get_rand_header_modern()
+                headers_to_use = Headers().get_rand_header_modern()
                 response = requests.get(url, headers=headers_to_use, timeout=10)
                 if response.status_code == 200:
                     return response
@@ -80,16 +80,16 @@ class ArxivScraper:
             print(f"\rGetting ArXiv results {start}-{start + num - 1}", end="", flush=True)
             url = self.__build_url(query, start, num)
             session = requests.Session()
-            headers_to_use = Headers.Headers().get_rand_header()
+            headers_to_use = Headers().get_rand_header()
             session.headers = headers_to_use
             response = session.get(url)
 
             # Attempt to resolve bad responses
             if response.status_code != 200:
                 try:
-                    selected_proxy = Proxies.Proxies().get_python_proxy()  # Use pypi proxies
+                    selected_proxy = Proxies().get_python_proxy()  # Use pypi proxies
                 except FreeProxyException:  # If none are available
-                    selected_proxy = Proxies.Proxies().get_rand_proxy()  # Use proxifly instead
+                    selected_proxy = Proxies().get_rand_proxy()  # Use proxifly instead
                 try:
                     response = session.get(url, proxies=selected_proxy)
                 except (ProxyError, ConnectionRefusedError, ConnectionError, MaxRetryError):
@@ -127,8 +127,8 @@ class ArxivScraper:
                 continue
 
             pdf_file_obj = io.BytesIO(response.content)
-            filter_result = FileFilterer.FileFilterer().arxiv_filter(pdf_file_obj, result, query, meta_can_be_missing)
-            result_index = FileGatherer.FileGatherer().handle_file_result(response, filter_result,
+            filter_result = FileFilterer().arxiv_filter(pdf_file_obj, result, query, meta_can_be_missing)
+            result_index = FileGatherer().handle_file_result(response, filter_result,
                                                                           result_index, path_to_directory, None, None,
                                                                           result['abstract'])
         print("\nAll ArXiv results scraped.")

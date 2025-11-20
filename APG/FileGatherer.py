@@ -5,10 +5,10 @@ import random
 import time
 import io
 
-import AcademicPaperGatherer.FileFilterer
-import AcademicPaperGatherer.FileWriter
-import AcademicPaperGatherer.DuplicateFilter
-import AcademicPaperGatherer.Headers
+from APG.FileFilterer import FileFilterer
+from APG.FileWriter import FileWriter
+from APG.DuplicateFilter import DuplicateFilter
+from APG.Headers import Headers
 
 
 class FileGatherer:
@@ -29,7 +29,7 @@ class FileGatherer:
         self.total_files_checked += 1
         for _ in range(max_tries):
             try:
-                headers_to_use = Headers.Headers().get_rand_header_modern()
+                headers_to_use = Headers().get_rand_header_modern()
                 response = requests.get(url, headers=headers_to_use, timeout=10)
                 if response.status_code == 200:
                     return response
@@ -81,7 +81,7 @@ class FileGatherer:
             if "pdf" in content_type:
                 self.total_gathered += 1
                 pdf_file_obj = io.BytesIO(response.content)
-                filter_result = FileFilterer.FileFilterer().filter(pdf_file_obj, query, meta_can_be_missing)
+                filter_result = FileFilterer().filter(pdf_file_obj, query, meta_can_be_missing)
                 result_index = self.handle_file_result(response, filter_result, result_index, path_to_directory,
                                                        year_start, year_end)
                 continue
@@ -108,7 +108,7 @@ class FileGatherer:
 
                     self.total_gathered += 1
                     pdf_file_obj = io.BytesIO(response.content)
-                    filter_result = FileFilterer.FileFilterer().filter(pdf_file_obj, query, meta_can_be_missing)
+                    filter_result = FileFilterer().filter(pdf_file_obj, query, meta_can_be_missing)
                     result_index = self.handle_file_result(response, filter_result, result_index, path_to_directory,
                                                            year_start, year_end)
         print("\nAll results scraped.")
@@ -135,9 +135,9 @@ class FileGatherer:
             year_is_good = True
             if year_start is not None and year_end is not None:
                 year_is_good = self.check_paper_year(year_start, year_end, filter_result[4])
-            if DuplicateFilter.DuplicateFilter().add_paper(filter_result[1], filter_result[2],
+            if DuplicateFilter().add_paper(filter_result[1], filter_result[2],
                                                            filter_result[3], filter_result[4]) and year_is_good:
-                writer = FileWriter.FileWriter()
+                writer = FileWriter()
                 file_path = os.path.join(path_to_directory, "Articles", f"{result_index}.pdf")
                 writer.write_file(file_path, response.content, 'wb')
                 writer.write_file(os.path.join(path_to_directory, "Titles", f"{result_index}.txt"),
@@ -158,7 +158,7 @@ class FileGatherer:
         else:
             # print(f"File filtered out.")
             if filter_result[1] is not None:
-                writer = FileWriter.FileWriter()
+                writer = FileWriter()
                 os.path.join(path_to_directory, "Bad", "Keywords", f"{result_index}.txt")
                 writer.write_file(os.path.join(path_to_directory, "Bad", "Titles", f"{result_index}.txt"),
                                   filter_result[1], 'w', "utf-8")

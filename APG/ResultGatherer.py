@@ -6,8 +6,8 @@ from fp.fp import FreeProxyException
 from requests.exceptions import ProxyError, ConnectionError
 from urllib3.exceptions import MaxRetryError
 
-import AcademicPaperGatherer.Headers
-import AcademicPaperGatherer.Proxies
+from APG.Headers import Headers
+from APG.Proxies import Proxies
 
 
 class ResultGatherer:
@@ -71,15 +71,15 @@ class ResultGatherer:
             print(f"\rGetting results {start}-{start+num-1}", end="", flush=True)
             url = self.__build_url(query, start, num, year_start, year_end)
             session = requests.Session()
-            headers_to_use = Headers.Headers().get_rand_header()
+            headers_to_use = Headers().get_rand_header()
             session.headers = headers_to_use
             response = session.get(url)
 
             if response.status_code != 200:
                 try:
-                    selected_proxy = Proxies.Proxies().get_python_proxy()  # Use pypi proxies
+                    selected_proxy = Proxies().get_python_proxy()  # Use pypi proxies
                 except FreeProxyException:  # If none are available
-                    selected_proxy = Proxies.Proxies().get_rand_proxy()  # Use proxifly instead
+                    selected_proxy = Proxies().get_rand_proxy()  # Use proxifly instead
                 try:
                     response = session.get(url, proxies=selected_proxy)
                 except (ProxyError, ConnectionRefusedError, ConnectionError, MaxRetryError):
