@@ -33,7 +33,7 @@ dependencies = [
 ]
 
 [project.scripts]
-APG = "AcademicPaperGatherer.cli:main"
+APG = "APG.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
